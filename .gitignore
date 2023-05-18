@@ -486,3 +486,6 @@ FodyWeavers.xsd
 
 # End of https://www.toptal.com/developers/gitignore/api/cmake,vim,c++,visualstudio,visualstudiocode
 .ccls*
+
+# Custom
+build/
