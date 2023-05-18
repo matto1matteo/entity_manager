@@ -10,6 +10,7 @@ public:
     ~Vec2() = default;
 
     Vec2(float x, float y);
+    static Vec2 FromSpeedAndAngle(float speed, float angle);
 
     float x = 0;
     float y = 0;
