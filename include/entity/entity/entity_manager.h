@@ -3,8 +3,8 @@
 #include <memory>
 #include <entity/entity.h>
 
-using EntityVec = std::vector<std::shared_ptr<Entity>>;
-using EntityMap = std::map<std::string, Entity>;
+typedef std::vector<std::shared_ptr<Entity>> EntityVec;
+typedef std::map<std::string, Entity> EntityMap;
 
 class EntityManager {
 private:

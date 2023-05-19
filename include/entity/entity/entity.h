@@ -10,7 +10,6 @@
 #include <components/score.h>
 #include <components/shape.h>
 #include <components/transform.h>
-#include <entity/entity_manager.h>
 
 class Entity {
     friend class EntityManager;
