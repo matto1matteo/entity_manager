@@ -10,6 +10,7 @@ TEST_CASE("vec2 basic op") {
     Vec2 v3(2.5, 3.0);
     Vec2 v4(2.0, 2.0);
     Vec2 v5(5.0, 7.0);
+    Vec2 v6(3, 4);
 
     SECTION("Equalities") {
         REQUIRE( v1 == v2 );
@@ -46,5 +47,24 @@ TEST_CASE("vec2 basic op") {
         std::cout << "v.x - mult.x = " << v.y - mult.y << std::endl;
         //REQUIRE(  mult == v );
 
+    }
+
+    SECTION("Mesurments") {
+        REQUIRE(v6.length() == 5);
+
+        float dist = v1.dist(v2);
+        REQUIRE( dist == 0 );
+        dist = v1.dist(v3);
+        REQUIRE( dist == 0.5 );
+        REQUIRE( v1.dist(v4) == 1 );
+        REQUIRE( v1.dist(v5) == 5 );
+    }
+
+    SECTION("Normalization") {
+        Vec2 v = v1.normalized();
+        std::cout << "Non normalized vec: (" << v.x << ", " << v.y << ")\n";
+        //REQUIRE( v == Vec2(0.5547, 0.83205) );
+        v1.normalize();
+        REQUIRE( v1 == v );
     }
 }
