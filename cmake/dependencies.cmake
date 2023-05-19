@@ -1,4 +1,3 @@
-
 function(dependency dependency_name repository tag)
     include(FetchContent)
     message(STATUS "Fetching: ${repository} @ ${tag}")
@@ -17,3 +16,7 @@ function(dependency dependency_name repository tag)
     )
 endfunction()
 
+
+dependency("vorbis" "https://github.com/xiph/vorbis.git" "v1.3.4")
+dependency("sfml" "https://github.com/SFML/SFML.git" "2.6.x")
+dependency("catch2" "https://github.com/catchorg/Catch2.git" "v3.3.2")
