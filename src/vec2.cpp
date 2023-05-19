@@ -9,8 +9,9 @@ Vec2::Vec2(float x, float y)
 
 Vec2 Vec2::FromSpeedAndAngle(float speed, float angle)
 {
-    float x = speed * cos(angle);
-    float y = speed * sin(angle);
+    float teta = (angle * M_PI) / 180;
+    float x = speed * sin(teta);
+    float y = speed * cos(teta);
     return Vec2(x, y);
 }
 
@@ -91,4 +92,29 @@ Vec2 Vec2::normalized() const
 {
     float len = length();
     return Vec2(x / len, y / len);
+}
+
+float Vec2::getAngle() const
+{
+    float teta = atan(abs(x) / abs(y)) * 180 / M_PI;
+    if (x >= 0 && y >= 0)
+    {
+        return teta;
+    }
+    else if (x < 0 && y >= 0)
+    {
+        return 180 - teta;
+    }
+    else if (x < 0 && y < 0)
+    {
+        return 180 + teta;
+    }
+    return 360 - teta;
+}
+
+
+std::ostream & operator << (std::ostream & out, const Vec2 vec)
+{
+    out << "Vec2(x: " << vec.x << ", y: " << vec.y << ")";
+    return out;
 }

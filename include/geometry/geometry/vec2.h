@@ -1,4 +1,5 @@
 #pragma once
+#include <ostream>
 
 class Vec2 {
 public:
@@ -35,6 +36,10 @@ public:
 
     void normalize();
     Vec2 normalized() const;
+
+    float getAngle() const;
+
+    friend std::ostream & operator << (std::ostream & out, const Vec2 vec);
 
 private:
     

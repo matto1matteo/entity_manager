@@ -4,13 +4,14 @@
 #include <catch2/catch_test_macros.hpp>
 #include <iostream>
 
-TEST_CASE("vec2 basic op") {
+TEST_CASE("vec2 op") {
     Vec2 v1(2.0, 3.0);
     Vec2 v2(2.0, 3.0);
     Vec2 v3(2.5, 3.0);
     Vec2 v4(2.0, 2.0);
     Vec2 v5(5.0, 7.0);
     Vec2 v6(3, 4);
+    Vec2 unit(1,1);
 
     SECTION("Equalities") {
         REQUIRE( v1 == v2 );
@@ -66,5 +67,14 @@ TEST_CASE("vec2 basic op") {
         //REQUIRE( v == Vec2(0.5547, 0.83205) );
         v1.normalize();
         REQUIRE( v1 == v );
+    }
+
+    SECTION("angle operations") {
+        REQUIRE(unit.getAngle() == 45);
+        Vec2 fromAngle = Vec2::FromSpeedAndAngle(1, 30);
+        Vec2 v (0.5, 0.866025);
+
+        //REQUIRE(v.getAngle() == 30);
+        REQUIRE(fromAngle.getAngle() == 30);
     }
 }
