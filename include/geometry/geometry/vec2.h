@@ -31,6 +31,11 @@ public:
 
     float dist(const Vec2 & rhs) const;
 
+    float length() const;
+
+    void normalize();
+    Vec2 normalized() const;
+
 private:
     
 };

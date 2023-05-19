@@ -33,3 +33,62 @@ Vec2 Vec2::operator - (const Vec2 & rhs) const
 {
     return Vec2(this->x - rhs.x, this->y - rhs.y);
 }
+
+void Vec2::operator += (const Vec2 & rhs)
+{
+    x += rhs.x;
+    y += rhs.y;
+}
+
+void Vec2::operator -= (const Vec2 & rhs)
+{
+    x -= rhs.x;
+    y -= rhs.y;
+}
+
+Vec2 Vec2::operator / (const float rhs) const
+{
+    return Vec2(x / rhs, y / rhs);
+}
+
+Vec2 Vec2::operator * (const float rhs) const
+{
+    return Vec2(x * rhs, y * rhs);
+}
+
+void Vec2::operator /= (const float rhs)
+{
+    x /= rhs;
+    y /= rhs;
+}
+
+void Vec2::operator *= (const float rhs)
+{
+    x *= rhs;
+    y *= rhs;
+}
+
+float Vec2::dist(const Vec2 & rhs) const
+{
+    float xdist = x - rhs.x;
+    float ydist = y - rhs.y;
+    return sqrt((xdist * xdist) + (ydist * ydist));
+}
+
+float Vec2::length() const
+{
+    return sqrt(x*x + y*y);
+}
+
+void Vec2::normalize()
+{
+    float len = length();
+    x /= len;
+    y /= len;
+}
+
+Vec2 Vec2::normalized() const
+{
+    float len = length();
+    return Vec2(x / len, y / len);
+}
