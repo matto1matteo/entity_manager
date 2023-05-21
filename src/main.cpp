@@ -7,8 +7,20 @@
 */
 
 #include <entity/entity.h>
+#include <game/game.h>
+#include <iostream>
 
 int main (int argc, char *argv[]) {
     
-    return 0;
+    try
+    {
+        Game g ("/home/mattomatteo/Projects/entity_manager/config.conf");
+        return g.run();
+    }
+    catch (ConfigException e)
+    {
+        std::cerr << e.Message << "\n";
+        return 1;
+    }
+    
 }

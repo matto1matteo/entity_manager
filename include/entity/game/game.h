@@ -9,6 +9,22 @@ struct Color {
     int R, G, B;
 };
 
+/// @brief  `WindowConfig` is a data struct that holds the configurations for the
+///         window
+struct WindowConfig {
+    int Width;
+    int Height;
+    int FrameRateLimit;
+    bool FullScreen;
+};
+
+/// @brief `FontConfig` data structure holding font configuration data
+struct FontConfig {
+    std::string File;
+    int Size;
+    int R, G, B;
+};
+
 /// The player spawn at the center at the start and whenever it dies
 /// Moves by Speed in the derections specificed by the controls (wasd)
 /// Can moove only inside the bound of the window
@@ -32,7 +48,7 @@ struct PlayerConfig {
 /// Will be given a random speed between MinSpeed and MaxSpeed
 /// Enemy will bounce on the window bounding box
 /// When a large enemies collide with a bullet N (number of vertices) small
-/// enemies will spawn in place of the original enemies, with the same N
+/// enemies will spawn in place of the original enemy, with the same N
 /// vertices of the original one with angles of a fixed value equal to 360/N.
 struct EnemyConfig {
     int ShapeRadius;
@@ -43,10 +59,12 @@ struct EnemyConfig {
     int OutlineThickness;
     int MinVertices;
     int MaxVertices;
-    int SmallLifeSpan;
+    int SmallLifespan;
     int SpawnCooldown;
 };
 
+/// @brief  `BulletConfig` data structure used to hold the configuration data of
+///         player bullets
 struct BulletConfig {
     int ShapeRadius;
     int CollisionRadius;
@@ -54,7 +72,7 @@ struct BulletConfig {
     Color FillColor;
     Color OutlineColor;
     int OutlineThickness;
-    int LifeSpan;
+    int Lifespan;
 };
 
 /// Special ability
@@ -62,22 +80,16 @@ struct SpecialConfig {
     int CoolDown;
 };
 
-/// `WindowConfig` is a data struct that holds the configurations for the
-/// window
-struct WindowConfig {
-    int Width;
-    int Height;
-    int FrameRateLimit;
-    bool FullScreen;
+struct ConfigException {
+    std::string Message;
 };
 
-struct FontConfig {
-    std::string File;
-    int Size;
-    int R, G, B;
-};
-
+/// A Score component will be assigned to each enemy and value of the score
+/// will be equal to N * 100 for big enemies and N * 200 for small eneemies
+/// where N is the number of vertices of the enemy.
+///
 /// `ESC` will close the game
+/// `P` will pause the game
 class Game {
 
 private:
@@ -100,20 +112,30 @@ private:
     std::shared_ptr<Entity> m_player;
 
 private:
-    /// `init` read configuration file `config_file` and set up game
-    /// options
+    /// @brief  `init` read configuration file `config_file` and set up game
+    ///         options. It will also create the SFML related objects
     void init(std::string config_file);
 
     /// when hitting `p` `setPaused` set the paused flag
     void setPaused(bool paused);
 
+    /// @brief  Movement system
     void sMovement();
-    void sUserInput();
-    void sLifespan();
-    void sRender();
-    void sEnemySpawner();
-    void sCollision();
 
+    /// @brief  Input system
+    void sUserInput();
+    
+    /// @brief  Lifespan system system
+    void sLifespan();
+
+    /// @brief  Render system
+    void sRender();
+
+    /// @brief  Enemy system
+    void sEnemySpawner();
+
+    /// @brief  Collision system system
+    void sCollision();
 
     /// To make our lives easier, we will set the origin with `Shape::setOrigin`
     /// to the center of the CircleShape
