@@ -71,6 +71,25 @@ BulletConfig getBulletConfig(std::istream& input)
     return bc;
 }
 
+void toggleFullScreen(sf::RenderWindow & window, bool isFullScreen, const sf::VideoMode & originalSize)
+{
+    if (isFullScreen)
+    {
+        window.create(
+            sf::VideoMode::getFullscreenModes()[0],
+            "EntityManager",
+            sf::Style::Fullscreen
+        );
+    }
+    else
+    {
+        window.create(
+            originalSize,
+            "EntityManager",
+            sf::Style::Default
+        );
+    }
+}
 void Game::init(std::string configFile)
 {
     std::fstream file(configFile);
@@ -80,22 +99,10 @@ void Game::init(std::string configFile)
     EnemyConfig enemy = getEnemyConfig(file);
     BulletConfig bullet = getBulletConfig(file);
 
-    window.FullScreen = true;
-    if (window.FullScreen)
-    {
-        m_window.create(
-            sf::VideoMode::getFullscreenModes()[0],
-            "EntityManager",
-            sf::Style::Fullscreen
-        );
-    }
-    else
-    {
-        m_window.create(
-            sf::VideoMode(window.Width, window.Height),
-            "EntityManager"
-        );
-    }
+    // init window
+    m_fullScreen = window.FullScreen;
+    m_originalSize = sf::VideoMode(window.Width, window.Height);
+    toggleFullScreen(m_window, m_fullScreen, m_originalSize);
     m_window.setFramerateLimit(window.FrameRateLimit);
 }
 
@@ -127,12 +134,11 @@ void Game::sUserInput()
             switch (event.key.code)
             {
             case sf::Keyboard::Escape:
-                std::cout << "Closing window\n";
                 m_window.close();
                 break;
             case sf::Keyboard::F:
-                std::cout << "Toggling full screen\n";
-                std::cout << "Is full screen: " << isFullScreen(m_window) << "\n";
+                m_fullScreen = !m_fullScreen;
+                toggleFullScreen(m_window, m_fullScreen, m_originalSize);
                 break;
             default:
                 break;

@@ -98,6 +98,9 @@ private:
     sf::Font m_font;
     sf::Text m_text;
 
+    sf::VideoMode m_originalSize;
+    bool m_fullScreen;
+
     PlayerConfig m_playerConfig;
     EnemyConfig m_enemyConfig;
     BulletConfig m_bulletConfig;
@@ -152,3 +155,14 @@ public:
     Game(std::string config_file);
     int run();
 };
+
+
+/// @brief  `toggleFullScreen` will toggle `window` to and from a full screen
+///         status
+///
+/// @param  `window` the SFML window to resize
+/// @param  `isFullScreen` tells wheter the window was previously in a full
+///         screen state or not
+/// @param  `originalSize` represents the video mode of the window when non
+///         in full screen
+void toggleFullScreen(sf::RenderWindow & window, bool isFullScreen, const sf::VideoMode & originalSize);
