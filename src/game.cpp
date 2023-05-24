@@ -4,8 +4,8 @@
 
 #include <iostream>
 
+using namespace mtt;
 Game::Game(std::string configFile)
-    : m_window(sf::VideoMode(600, 400), "EntityManager")
 {
     init(configFile);
 }
@@ -15,14 +15,15 @@ void checkType(std::istream& input, const std::string& expectedType)
     std::string type;
     input >> type;
     if (type != expectedType) {
-        throw ConfigException {
+        throw mtt::ConfigException {
             .Message = "Expected " + expectedType + " config section got: " + type,
         };
     }
 }
 
-WindowConfig getWindowConfig(std::istream& input)
+mtt::WindowConfig getWindowConfig(std::istream& input)
 {
+    using namespace mtt;
     WindowConfig config;
     checkType(input, "Window");
     input >> config.Width >> config.Height >> config.FrameRateLimit >> config.FullScreen;
@@ -33,7 +34,8 @@ FontConfig getFontConfig(std::istream& input)
 {
     FontConfig fc;
     checkType(input, "Font");
-    input >> fc.File >> fc.Size >> fc.R >> fc.G >> fc.B;
+    input >> fc.File >> fc.Size;
+    input >> fc.FontColor.R >> fc.FontColor.G >> fc.FontColor.B;
     return fc;
 }
 
@@ -71,45 +73,23 @@ BulletConfig getBulletConfig(std::istream& input)
     return bc;
 }
 
-void toggleFullScreen(sf::RenderWindow & window, bool isFullScreen, const sf::VideoMode & originalSize)
-{
-    if (isFullScreen)
-    {
-        window.create(
-            sf::VideoMode::getFullscreenModes()[0],
-            "EntityManager",
-            sf::Style::Fullscreen
-        );
-    }
-    else
-    {
-        window.create(
-            originalSize,
-            "EntityManager",
-            sf::Style::Default
-        );
-    }
-}
 void Game::init(std::string configFile)
 {
     std::fstream file(configFile);
-    WindowConfig window = getWindowConfig(file);
+    WindowConfig windowCfg = getWindowConfig(file);
     FontConfig font = getFontConfig(file);
     PlayerConfig player = getPlayerConfig(file);
     EnemyConfig enemy = getEnemyConfig(file);
     BulletConfig bullet = getBulletConfig(file);
 
     // init window
-    m_fullScreen = window.FullScreen;
-    m_originalSize = sf::VideoMode(window.Width, window.Height);
-    toggleFullScreen(m_window, m_fullScreen, m_originalSize);
-    m_window.setFramerateLimit(window.FrameRateLimit);
+    window.create(windowCfg);
 }
 
 void Game::sRender()
 {
-    m_window.clear();
-    m_window.display();
+    window.clear();
+    window.display();
 }
 
 bool isFullScreen(const sf::RenderWindow & window)
@@ -124,21 +104,21 @@ bool isFullScreen(const sf::RenderWindow & window)
 void Game::sUserInput()
 {
     sf::Event event;
-    while (m_window.pollEvent(event)) {
+    while (window.pollEvent(event)) {
         if (event.type == sf::Event::Closed) {
             std::cout << "Closing window\n";
-            m_window.close();
+            window.close();
         }
         else if (event.type == sf::Event::KeyPressed)
         {
             switch (event.key.code)
             {
             case sf::Keyboard::Escape:
-                m_window.close();
+                window.close();
                 break;
             case sf::Keyboard::F:
                 m_fullScreen = !m_fullScreen;
-                toggleFullScreen(m_window, m_fullScreen, m_originalSize);
+                window.toggleFullScreen();
                 break;
             default:
                 break;
@@ -149,7 +129,7 @@ void Game::sUserInput()
 
 int Game::run()
 {
-    while (m_window.isOpen()) {
+    while (window.isOpen()) {
         sUserInput();
         sRender();
     }

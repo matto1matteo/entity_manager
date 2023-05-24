@@ -31,6 +31,7 @@ set(entity_manager_source
     "src/vec2.cpp"
     "src/entity_manager.cpp"
     "src/game.cpp"
+    "src/window.cpp"
 )
 add_library(${entity_manager_lib} 
         STATIC ${entity_manager_source})

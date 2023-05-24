@@ -4,85 +4,12 @@
 #include <entity/entity_manager.h>
 #include <memory>
 #include <string>
+#include <game/game_configs.hpp>
+#include <game/window.hpp>
 
-struct Color {
-    int R, G, B;
-};
 
-/// @brief  `WindowConfig` is a data struct that holds the configurations for the
-///         window
-struct WindowConfig {
-    int Width;
-    int Height;
-    int FrameRateLimit;
-    bool FullScreen;
-};
-
-/// @brief `FontConfig` data structure holding font configuration data
-struct FontConfig {
-    std::string File;
-    int Size;
-    int R, G, B;
-};
-
-/// The player spawn at the center at the start and whenever it dies
-/// Moves by Speed in the derections specificed by the controls (wasd)
-/// Can moove only inside the bound of the window
-/// Left click from mouse trigger a bullet to spawn in the dirction of the mouse
-/// Right click from mouse trigger the special ability
-struct PlayerConfig {
-    int ShapeRadius;
-    int CollisionRadius;
-    float Speed;
-    Color FillColor;
-    Color OutlineColor;
-    int OutlineThickness;
-    int Vertices;
-};
-
-/// Enemy spawn in a random locations every SpawnCooldown in the bounding box of
-/// the window
-/// Each enemy will have a random number of vertices between MinVertices and
-/// MaxVertices
-/// Will be given a random color
-/// Will be given a random speed between MinSpeed and MaxSpeed
-/// Enemy will bounce on the window bounding box
-/// When a large enemies collide with a bullet N (number of vertices) small
-/// enemies will spawn in place of the original enemy, with the same N
-/// vertices of the original one with angles of a fixed value equal to 360/N.
-struct EnemyConfig {
-    int ShapeRadius;
-    int CollisionRadius;
-    float MinSpeed;
-    float MaxSpeed;
-    Color OutlineColor;
-    int OutlineThickness;
-    int MinVertices;
-    int MaxVertices;
-    int SmallLifespan;
-    int SpawnCooldown;
-};
-
-/// @brief  `BulletConfig` data structure used to hold the configuration data of
-///         player bullets
-struct BulletConfig {
-    int ShapeRadius;
-    int CollisionRadius;
-    float Speed;
-    Color FillColor;
-    Color OutlineColor;
-    int OutlineThickness;
-    int Lifespan;
-};
-
-/// Special ability
-struct SpecialConfig {
-    int CoolDown;
-};
-
-struct ConfigException {
-    std::string Message;
-};
+namespace mtt
+{
 
 /// A Score component will be assigned to each enemy and value of the score
 /// will be equal to N * 100 for big enemies and N * 200 for small eneemies
@@ -93,7 +20,7 @@ struct ConfigException {
 class Game {
 
 private:
-    sf::RenderWindow m_window;
+    mtt::Window window;
     EntityManager m_entities;
     sf::Font m_font;
     sf::Text m_text;
@@ -157,12 +84,5 @@ public:
 };
 
 
-/// @brief  `toggleFullScreen` will toggle `window` to and from a full screen
-///         status
-///
-/// @param  `window` the SFML window to resize
-/// @param  `isFullScreen` tells wheter the window was previously in a full
-///         screen state or not
-/// @param  `originalSize` represents the video mode of the window when non
-///         in full screen
-void toggleFullScreen(sf::RenderWindow & window, bool isFullScreen, const sf::VideoMode & originalSize);
+    
+}
