@@ -6,6 +6,7 @@
 #include <string>
 #include <game/game_configs.hpp>
 #include <game/window.hpp>
+#include <game/score.hpp>
 
 
 namespace mtt
@@ -21,23 +22,19 @@ class Game {
 
 private:
     mtt::Window window;
-    EntityManager m_entities;
-    sf::Font m_font;
-    sf::Text m_text;
+    EntityManager entities;
+    sf::Font font;
+    mtt::Score score;
 
-    sf::VideoMode m_originalSize;
-    bool m_fullScreen;
+    PlayerConfig playerConfig;
+    EnemyConfig enemyConfing;
+    BulletConfig bulletConfig;
 
-    PlayerConfig m_playerConfig;
-    EnemyConfig m_enemyConfig;
-    BulletConfig m_bulletConfig;
-
-    int m_score = 0;
     int m_currentFrame = 0;
     int m_lastEnemySpawnTime = 0;
 
-    bool m_paused = false;
-    bool m_running = true;
+    bool paused = false;
+    bool running = true;
 
     std::shared_ptr<Entity> m_player;
 
@@ -83,6 +80,9 @@ public:
     int run();
 };
 
+struct FontNotFound {
+    std::string Message;
+};
 
-    
+sf::Font fromConfigs(const FontConfig & configs);
 }

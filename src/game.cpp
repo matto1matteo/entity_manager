@@ -4,13 +4,13 @@
 
 #include <iostream>
 
-using namespace mtt;
+namespace mtt {
 Game::Game(std::string configFile)
 {
     init(configFile);
 }
 
-void checkType(std::istream& input, const std::string& expectedType)
+inline void checkType(std::istream& input, const std::string& expectedType)
 {
     std::string type;
     input >> type;
@@ -23,17 +23,16 @@ void checkType(std::istream& input, const std::string& expectedType)
 
 mtt::WindowConfig getWindowConfig(std::istream& input)
 {
-    using namespace mtt;
-    WindowConfig config;
     checkType(input, "Window");
+    WindowConfig config;
     input >> config.Width >> config.Height >> config.FrameRateLimit >> config.FullScreen;
     return config;
 }
 
 FontConfig getFontConfig(std::istream& input)
 {
-    FontConfig fc;
     checkType(input, "Font");
+    FontConfig fc;
     input >> fc.File >> fc.Size;
     input >> fc.FontColor.R >> fc.FontColor.G >> fc.FontColor.B;
     return fc;
@@ -41,8 +40,8 @@ FontConfig getFontConfig(std::istream& input)
 
 PlayerConfig getPlayerConfig(std::istream& input)
 {
-    PlayerConfig pc;
     checkType(input, "Player");
+    PlayerConfig pc;
     input >> pc.ShapeRadius >> pc.CollisionRadius >> pc.Speed;
     input >> pc.FillColor.R >> pc.FillColor.G >> pc.FillColor.B;
     input >> pc.OutlineColor.R >> pc.OutlineColor.G >> pc.OutlineColor.B;
@@ -52,8 +51,8 @@ PlayerConfig getPlayerConfig(std::istream& input)
 
 EnemyConfig getEnemyConfig(std::istream& input)
 {
-    EnemyConfig ec;
     checkType(input, "Enemy");
+    EnemyConfig ec;
     input >> ec.ShapeRadius >> ec.CollisionRadius >> ec.MinSpeed >> ec.MaxSpeed;
     input >> ec.OutlineColor.R >> ec.OutlineColor.G >> ec.OutlineColor.B;
     input >> ec.OutlineThickness >> ec.MinVertices >> ec.MaxVertices;
@@ -63,9 +62,8 @@ EnemyConfig getEnemyConfig(std::istream& input)
 
 BulletConfig getBulletConfig(std::istream& input)
 {
-    BulletConfig bc;
-    std::string type;
     checkType(input, "Bullet");
+    BulletConfig bc;
     input >> bc.ShapeRadius >> bc.CollisionRadius >> bc.Speed;
     input >> bc.FillColor.R >> bc.FillColor.G >> bc.FillColor.B;
     input >> bc.OutlineColor.R >> bc.OutlineColor.G >> bc.OutlineColor.B;
@@ -76,19 +74,24 @@ BulletConfig getBulletConfig(std::istream& input)
 void Game::init(std::string configFile)
 {
     std::fstream file(configFile);
-    WindowConfig windowCfg = getWindowConfig(file);
-    FontConfig font = getFontConfig(file);
-    PlayerConfig player = getPlayerConfig(file);
-    EnemyConfig enemy = getEnemyConfig(file);
-    BulletConfig bullet = getBulletConfig(file);
+    WindowConfig windowConfig = getWindowConfig(file);
+    FontConfig fontConfig = getFontConfig(file);
+    playerConfig = getPlayerConfig(file);
+    enemyConfing = getEnemyConfig(file);
+    bulletConfig = getBulletConfig(file);
 
     // init window
-    window.create(windowCfg);
+    window.create(windowConfig);
+    font = fromConfigs(fontConfig);
+    score.setUp(font, fontConfig.Size, fontConfig.FontColor);
+    score.updateText();
 }
 
 void Game::sRender()
 {
     window.clear();
+
+    window.draw(score.Text);
     window.display();
 }
 
@@ -117,7 +120,6 @@ void Game::sUserInput()
                 window.close();
                 break;
             case sf::Keyboard::F:
-                m_fullScreen = !m_fullScreen;
                 window.toggleFullScreen();
                 break;
             default:
@@ -134,4 +136,17 @@ int Game::run()
         sRender();
     }
     return 0;
+}
+
+sf::Font fromConfigs(const FontConfig & configs)
+{
+    sf::Font font;
+    if (!font.loadFromFile(configs.File))
+    {
+        throw FontNotFound {
+            .Message = "Font " + configs.File + " not found",
+        };
+    }
+    return font;
+}
 }

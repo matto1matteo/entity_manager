@@ -32,6 +32,7 @@ set(entity_manager_source
     "src/entity_manager.cpp"
     "src/game.cpp"
     "src/window.cpp"
+    "src/score.cpp"
 )
 add_library(${entity_manager_lib} 
         STATIC ${entity_manager_source})

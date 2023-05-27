@@ -19,6 +19,7 @@ public:
     bool isOpen() const { return window.isOpen(); }
     bool pollEvent(sf::Event & event) { return window.pollEvent(event); }
     void close() { window.close(); }
+    void draw(const sf::Drawable & drowable);
 
     bool isFullScreen() const { return fullScreen; }
 

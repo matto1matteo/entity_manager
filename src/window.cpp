@@ -55,4 +55,9 @@ void Window::toggleFullScreen()
     fullScreen = !fullScreen;
     create();
 }
+
+void Window::draw(const sf::Drawable & drowable)
+{
+    window.draw(drowable);
+}
 }
