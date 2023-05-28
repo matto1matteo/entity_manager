@@ -2,6 +2,7 @@
 
 #include <geometry/vec2.h>
 
+/// @brief  Component class used to store data about entity transformations
 class CTransform {
 public:
     Vec2 pos = { 0.0f, 0.0f };

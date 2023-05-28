@@ -93,7 +93,7 @@ void Game::sRender()
 
     for (auto e : entities.getEntities())
     {
-        if (e->cShape != nullptr)
+        if (e->cShape != nullptr && e->cTransform != nullptr)
         {
             window.draw(e->cShape->circle);
         }
@@ -103,13 +103,23 @@ void Game::sRender()
     window.display();
 }
 
-bool isFullScreen(const sf::RenderWindow & window)
+void Game::sMovement()
 {
-    auto windowSize = window.getSize();
-    auto screenSize = sf::VideoMode::getDesktopMode();
+    for (auto e : entities.getEntities())
+    {
+        if ( e->tag() != "player"
+            && e->cShape != nullptr
+            && e->cTransform != nullptr)
+        {
+            e->cShape->circle.setPosition(e->cTransform->pos.x, e->cTransform->pos.y);
+            e->cTransform->pos += e->cTransform->velocity;
+        }
+    }
+}
 
-    return (windowSize.x == screenSize.width)
-        && (windowSize.y == screenSize.height);
+void Game::setPaused(bool paused)
+{
+    this->paused = paused;
 }
 
 void Game::sUserInput()
@@ -117,7 +127,6 @@ void Game::sUserInput()
     sf::Event event;
     while (window.pollEvent(event)) {
         if (event.type == sf::Event::Closed) {
-            std::cout << "Closing window\n";
             window.close();
         }
         else if (event.type == sf::Event::KeyPressed)
@@ -130,9 +139,23 @@ void Game::sUserInput()
             case sf::Keyboard::F:
                 window.toggleFullScreen();
                 break;
+            case sf::Keyboard::P:
+                setPaused(!paused);
+                break;
             default:
                 break;
             }
+        }
+    }
+}
+
+void Game::sLifespan()
+{
+    for(auto e : entities.getEntities())
+    {
+        if (e->cLifespan != nullptr)
+        {
+            e->cLifespan->remaning -= 1;
         }
     }
 }
@@ -156,11 +179,14 @@ void Game::spawnPlayer()
         ),
         playerConfig.OutlineThickness
     );
-    //player->cCollision = std::make_shared<CCollision>();
-    //player->cTransform = std::make_shared<CTransform>();
-
-    player->cShape->circle.setOrigin(0, 0);
+    player->cCollision = std::make_shared<CCollision>(playerConfig.CollisionRadius);
     Vec2 windowSize = window.getSize();
+    player->cTransform = std::make_shared<CTransform>(
+        Vec2(windowSize.x / 2, windowSize.y/2),
+        Vec2(playerConfig.Speed, playerConfig.Speed),
+        0.0f
+    );
+
     player->cShape->circle.setPosition(windowSize.x / 2, windowSize.y/2);
 }
 
@@ -168,11 +194,13 @@ int Game::run()
 {
     spawnPlayer();
     while (window.isOpen()) {
+        currentFrame++;
         entities.update();
 
         if (!paused)
         {
-            currentFrame++;
+            sMovement();
+            sLifespan();
         }
 
         sUserInput();
