@@ -139,7 +139,7 @@ void Game::sUserInput()
 
 void Game::spawnPlayer()
 {
-    player = entities.addEntity("player", 1);
+    player = entities.addEntity("player");
     player->cInput = std::make_shared<CInput>();
     player->cShape = std::make_shared<CShape>(
         playerConfig.ShapeRadius,

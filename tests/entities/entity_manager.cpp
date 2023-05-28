@@ -13,13 +13,13 @@ TEST_CASE("EntityManager add entities") {
     TestEntityManager friendTester;
     EntityManager manager;
     SECTION("Adding entities") {
-        manager.addEntity("hello", 1);
+        manager.addEntity("hello");
         REQUIRE(manager.getEntities().size() == 0);
         REQUIRE(friendTester.getToAdd(manager).size() == 1);
     }
 
     SECTION("Adding entities and update") {
-        manager.addEntity("hello", 1);
+        manager.addEntity("hello");
         manager.update();
 
         REQUIRE(manager.getEntities().size() == 1);
@@ -29,10 +29,10 @@ TEST_CASE("EntityManager add entities") {
 
     SECTION("Checking tagged entities")
     {
-        manager.addEntity("hello", 1);
-        manager.addEntity("hello", 2);
-        manager.addEntity("hello", 3);
-        manager.addEntity("Culo", 4);
+        manager.addEntity("hello");
+        manager.addEntity("hello");
+        manager.addEntity("hello");
+        manager.addEntity("Culo");
         manager.update();
         REQUIRE(manager.getEntities().size() == 4);
         REQUIRE(friendTester.getEntityMap(manager).size() == 2);
@@ -46,7 +46,7 @@ TEST_CASE("EntityManager add entities") {
 TEST_CASE("Removing entities") {
     TestEntityManager friendTester;
     EntityManager manager;
-    std::shared_ptr<Entity> e = manager.addEntity("hello", 1);
+    std::shared_ptr<Entity> e = manager.addEntity("hello");
     REQUIRE(manager.getEntities().size() == 0);
     manager.update();
     REQUIRE(manager.getEntities().size() == 1);

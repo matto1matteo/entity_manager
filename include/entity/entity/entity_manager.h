@@ -17,6 +17,8 @@ private:
     EntityMap m_entitiesMap;
     EntityVec m_entitiesToAdd;
 
+    uint64_t id = 0;
+
 public:
     EntityManager();
     EntityManager(EntityManager &&) = default;
@@ -32,7 +34,7 @@ public:
     void update();
 
     /// @brief This method adds up an entity to the stored entities
-    std::shared_ptr<Entity> addEntity(const std::string& tag, size_t id);
+    std::shared_ptr<Entity> addEntity(const std::string& tag);
 
     /// @brief  Accessor methods for stored entities
     EntityVec & getEntities();
