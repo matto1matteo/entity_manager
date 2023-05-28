@@ -91,6 +91,14 @@ void Game::sRender()
 {
     window.clear();
 
+    for (auto e : entities.getEntities())
+    {
+        if (e->cShape != nullptr)
+        {
+            window.draw(e->cShape->circle);
+        }
+    }
+
     window.draw(score.Text);
     window.display();
 }
@@ -129,9 +137,44 @@ void Game::sUserInput()
     }
 }
 
+void Game::spawnPlayer()
+{
+    player = entities.addEntity("player", 1);
+    player->cInput = std::make_shared<CInput>();
+    player->cShape = std::make_shared<CShape>(
+        playerConfig.ShapeRadius,
+        playerConfig.Vertices,
+        sf::Color(
+            playerConfig.FillColor.R,
+            playerConfig.FillColor.B,
+            playerConfig.FillColor.G
+        ),
+        sf::Color(
+            playerConfig.OutlineColor.R,
+            playerConfig.OutlineColor.B,
+            playerConfig.OutlineColor.G
+        ),
+        playerConfig.OutlineThickness
+    );
+    //player->cCollision = std::make_shared<CCollision>();
+    //player->cTransform = std::make_shared<CTransform>();
+
+    player->cShape->circle.setOrigin(0, 0);
+    Vec2 windowSize = window.getSize();
+    player->cShape->circle.setPosition(windowSize.x / 2, windowSize.y/2);
+}
+
 int Game::run()
 {
+    spawnPlayer();
     while (window.isOpen()) {
+        entities.update();
+
+        if (!paused)
+        {
+            currentFrame++;
+        }
+
         sUserInput();
         sRender();
     }

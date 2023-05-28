@@ -60,4 +60,10 @@ void Window::draw(const sf::Drawable & drowable)
 {
     window.draw(drowable);
 }
+
+Vec2 Window::getSize() const
+{
+    auto size = window.getSize();
+    return Vec2(size.x, size.y);
+}
 }

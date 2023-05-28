@@ -30,13 +30,13 @@ private:
     EnemyConfig enemyConfing;
     BulletConfig bulletConfig;
 
-    int m_currentFrame = 0;
-    int m_lastEnemySpawnTime = 0;
+    int currentFrame = 0;
+    int lastEnemySpawnTime = 0;
 
     bool paused = false;
     bool running = true;
 
-    std::shared_ptr<Entity> m_player;
+    std::shared_ptr<Entity> player;
 
 private:
     /// @brief  `init` read configuration file `config_file` and set up game

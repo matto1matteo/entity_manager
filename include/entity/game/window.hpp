@@ -2,6 +2,7 @@
 #include <SFML/Graphics.hpp>
 
 #include <game/game_configs.hpp>
+#include <geometry/vec2.h>
 
 namespace mtt {
 
@@ -20,6 +21,7 @@ public:
     bool pollEvent(sf::Event & event) { return window.pollEvent(event); }
     void close() { window.close(); }
     void draw(const sf::Drawable & drowable);
+    Vec2 getSize() const;
 
     bool isFullScreen() const { return fullScreen; }
 
