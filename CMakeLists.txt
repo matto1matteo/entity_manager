@@ -33,13 +33,14 @@ set(entity_manager_source
     "src/game.cpp"
     "src/window.cpp"
     "src/score.cpp"
+    "src/rand.cpp"
 )
 add_library(${entity_manager_lib} 
         STATIC ${entity_manager_source})
 target_include_directories(${entity_manager_lib}
     PUBLIC "include/entity"
         "include/components"
-        "include/geometry")
+        "include/math")
 target_link_libraries(${entity_manager_lib}
     PUBLIC sfml-system sfml-window sfml-graphics)
 
