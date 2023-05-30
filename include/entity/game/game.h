@@ -58,7 +58,7 @@ private:
     /// @brief  Render system
     void sRender();
 
-    /// @brief  Enemy system
+    /// @brief  Enemy spawning system
     void sEnemySpawner();
 
     /// @brief  Collision system system

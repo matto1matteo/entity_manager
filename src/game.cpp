@@ -1,8 +1,9 @@
 #include <fstream>
 #include <game/game.h>
 #include <istream>
-
-#include <iostream>
+#include <math.h>
+#include <rand/random.hpp>
+#include <trig/trig.hpp>
 
 namespace mtt {
 Game::Game(std::string configFile)
@@ -91,10 +92,8 @@ void Game::sRender()
 {
     window.clear();
 
-    for (auto e : entities.getEntities())
-    {
-        if (e->cShape != nullptr && e->cTransform != nullptr)
-        {
+    for (auto e : entities.getEntities()) {
+        if (e->cShape != nullptr && e->cTransform != nullptr) {
             window.draw(e->cShape->circle);
         }
     }
@@ -105,12 +104,10 @@ void Game::sRender()
 
 void Game::sMovement()
 {
-    for (auto e : entities.getEntities())
-    {
-        if ( e->tag() != "player"
+    for (auto e : entities.getEntities()) {
+        if (e->tag() != "player"
             && e->cShape != nullptr
-            && e->cTransform != nullptr)
-        {
+            && e->cTransform != nullptr) {
             e->cShape->circle.setPosition(e->cTransform->pos.x, e->cTransform->pos.y);
             e->cTransform->pos += e->cTransform->velocity;
         }
@@ -128,11 +125,8 @@ void Game::sUserInput()
     while (window.pollEvent(event)) {
         if (event.type == sf::Event::Closed) {
             window.close();
-        }
-        else if (event.type == sf::Event::KeyPressed)
-        {
-            switch (event.key.code)
-            {
+        } else if (event.type == sf::Event::KeyPressed) {
+            switch (event.key.code) {
             case sf::Keyboard::Escape:
                 window.close();
                 break;
@@ -151,10 +145,8 @@ void Game::sUserInput()
 
 void Game::sLifespan()
 {
-    for(auto e : entities.getEntities())
-    {
-        if (e->cLifespan != nullptr)
-        {
+    for (auto e : entities.getEntities()) {
+        if (e->cLifespan != nullptr) {
             e->cLifespan->remaning -= 1;
         }
     }
@@ -170,24 +162,68 @@ void Game::spawnPlayer()
         sf::Color(
             playerConfig.FillColor.R,
             playerConfig.FillColor.B,
-            playerConfig.FillColor.G
-        ),
+            playerConfig.FillColor.G),
         sf::Color(
             playerConfig.OutlineColor.R,
             playerConfig.OutlineColor.B,
-            playerConfig.OutlineColor.G
-        ),
-        playerConfig.OutlineThickness
-    );
+            playerConfig.OutlineColor.G),
+        playerConfig.OutlineThickness);
     player->cCollision = std::make_shared<CCollision>(playerConfig.CollisionRadius);
     Vec2 windowSize = window.getSize();
     player->cTransform = std::make_shared<CTransform>(
-        Vec2(windowSize.x / 2, windowSize.y/2),
+        Vec2(windowSize.x / 2, windowSize.y / 2),
         Vec2(playerConfig.Speed, playerConfig.Speed),
-        0.0f
+        0.0f);
+
+    player->cShape->circle.setPosition(windowSize.x / 2, windowSize.y / 2);
+}
+
+void Game::sEnemySpawner()
+{
+    // do not spawn an enemy each frame
+    if (currentFrame <= lastEnemySpawnTime + enemyConfing.SpawnCooldown) {
+        return;
+    }
+
+    lastEnemySpawnTime = currentFrame;
+
+    std::srand(std::time(nullptr));
+    float cx = randRange(
+        (float)enemyConfing.ShapeRadius,
+        window.getSize().x - (float)enemyConfing.ShapeRadius);
+    float cy = randRange(
+        (float)enemyConfing.ShapeRadius,
+        window.getSize().y - (float)enemyConfing.ShapeRadius);
+    int vertices = randRange(enemyConfing.MinVertices, enemyConfing.MaxVertices);
+    Color fill = {
+        .R = randRange(255),
+        .G = randRange(255),
+        .B = randRange(255),
+    };
+    float speed = randRange(enemyConfing.MinSpeed, enemyConfing.MaxSpeed);
+
+    float teta = fromRad(randRange((float)(2 * M_PI)));
+    auto enemy = entities.addEntity("big-enemy");
+
+    enemy->cTransform = std::make_shared<CTransform>(
+        Vec2(cx, cy),
+        Vec2::FromSpeedAndAngle(speed, teta),
+        teta);
+
+    enemy->cShape = std::make_shared<CShape>(
+        enemyConfing.ShapeRadius,
+        vertices,
+        sf::Color(fill.R, fill.G, fill.B),
+        sf::Color(
+            enemyConfing.OutlineColor.R,
+            enemyConfing.OutlineColor.G,
+            enemyConfing.OutlineColor.B
+        ),
+        enemyConfing.OutlineThickness
     );
 
-    player->cShape->circle.setPosition(windowSize.x / 2, windowSize.y/2);
+    enemy->cScore = std::make_shared<CScore>(vertices * 100);
+    enemy->cCollision = std::make_shared<CCollision>(enemyConfing.CollisionRadius);
 }
 
 int Game::run()
@@ -196,24 +232,23 @@ int Game::run()
     while (window.isOpen()) {
         currentFrame++;
         entities.update();
+        sUserInput();
 
-        if (!paused)
-        {
+        if (!paused) {
             sMovement();
             sLifespan();
+            sEnemySpawner();
         }
 
-        sUserInput();
         sRender();
     }
     return 0;
 }
 
-sf::Font fromConfigs(const FontConfig & configs)
+sf::Font fromConfigs(const FontConfig& configs)
 {
     sf::Font font;
-    if (!font.loadFromFile(configs.File))
-    {
+    if (!font.loadFromFile(configs.File)) {
         throw FontNotFound {
             .Message = "Font " + configs.File + " not found",
         };
