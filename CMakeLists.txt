@@ -34,6 +34,7 @@ set(entity_manager_source
     "src/window.cpp"
     "src/score.cpp"
     "src/rand.cpp"
+    "src/trig.cpp"
 )
 add_library(${entity_manager_lib} 
         STATIC ${entity_manager_source})
