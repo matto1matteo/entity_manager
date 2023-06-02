@@ -3,6 +3,7 @@
 
 #include <game/game_configs.hpp>
 #include <geometry/vec2.h>
+#include <entity/entity.h>
 
 namespace mtt {
 
@@ -24,6 +25,26 @@ public:
     Vec2 getSize() const;
 
     bool isFullScreen() const { return fullScreen; }
+
+    /// @brief  Tells if the given entity is overflowing on the x axis
+    ///         of the window
+    /// @param  entity  the entity that we would like to test against
+    bool overflowX(const Entity & entity) const;
+
+    /// @brief  Tells if the given entity is underflowing on the x axis
+    ///         of the window
+    /// @param  entity  the entity that we would like to test against
+    bool underflowX(const Entity & entity) const;
+
+    /// @brief  Tells if the given entity is overflowing on the y axis
+    ///         of the window
+    /// @param  entity  the entity that we would like to test against
+    bool overflowY(const Entity & entity) const;
+
+    /// @brief  Tells if the given entity is underflowing on the y axis
+    ///         of the window
+    /// @param  entity  the entity that we would like to test against
+    bool underflowY(const Entity & entity) const;
 
     /// @brief  `toggleFullScreen` will toggle `window` to and from a full screen
     ///         status

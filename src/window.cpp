@@ -66,4 +66,34 @@ Vec2 Window::getSize() const
     auto size = window.getSize();
     return Vec2(size.x, size.y);
 }
+
+bool Window::overflowX(const Entity & entity) const
+{
+    float windowWidth = getSize().x;
+    float radius = entity.cShape->circle.getRadius();
+    Vec2 position = entity.cTransform->pos;
+    return position.x + radius >= windowWidth;
+}
+
+bool Window::underflowX(const Entity & entity) const
+{
+    float radius = entity.cShape->circle.getRadius();
+    Vec2 position = entity.cTransform->pos;
+    return position.x - radius <= 0;
+}
+
+bool Window::overflowY(const Entity & entity) const
+{
+    float windowHeight = getSize().y;
+    float radius = entity.cShape->circle.getRadius();
+    Vec2 position = entity.cTransform->pos;
+    return position.y + radius >= windowHeight;
+}
+
+bool Window::underflowY(const Entity & entity) const
+{
+    float radius = entity.cShape->circle.getRadius();
+    Vec2 position = entity.cTransform->pos;
+    return position.y - radius <= 0;
+}
 }

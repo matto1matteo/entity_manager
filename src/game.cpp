@@ -105,12 +105,34 @@ void Game::sRender()
 void Game::sMovement()
 {
     for (auto e : entities.getEntities()) {
-        if (e->tag() != "player"
+        if (e->tag() != "big-enemy"
             && e->cShape != nullptr
-            && e->cTransform != nullptr) {
-            e->cShape->circle.setPosition(e->cTransform->pos.x, e->cTransform->pos.y);
-            e->cTransform->pos += e->cTransform->velocity;
+            && e->cTransform != nullptr
+            && e->cCollision != nullptr
+        )
+        {
+            continue;
         }
+
+        // check bounce x axis
+        if (window.overflowX(*e) || window.underflowX(*e))
+        {
+            e->cTransform->velocity = Vec2(
+                -(e->cTransform->velocity.x),
+                e->cTransform->velocity.y);
+        }
+
+        // check bounce y axis
+        if (window.overflowY(*e) || window.underflowY(*e))
+        {
+            e->cTransform->velocity = Vec2(
+                e->cTransform->velocity.x,
+                -(e->cTransform->velocity.y));
+        }
+
+        // actual movement
+        e->cShape->circle.setPosition(e->cTransform->pos.x, e->cTransform->pos.y);
+        e->cTransform->pos += e->cTransform->velocity;
     }
 }
 
