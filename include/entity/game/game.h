@@ -67,11 +67,17 @@ private:
     /// To make our lives easier, we will set the origin with `Shape::setOrigin`
     /// to the center of the CircleShape
     void spawnPlayer();
+
     /// To make our lives easier, we will set the origin with `Shape::setOrigin`
     /// to the center of the CircleShape
     void spawnEnemy();
 
     void spawnSmallEnemies(std::shared_ptr<Entity> entity);
+
+    /// @brief  `spanwBullet` will take player `entity` pointer and will spawn
+    ///         a bullet sending it towards `pos`
+    /// @param  `entity` bullet entity
+    /// @param  `pos` vector that indicate the trajectory
     void spawnBullet(std::shared_ptr<Entity> entity, const Vec2& pos);
     void spawnSpecialWeapon(std::shared_ptr<Entity> entity);
 

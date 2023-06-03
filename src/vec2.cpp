@@ -96,20 +96,20 @@ Vec2 Vec2::normalized() const
 
 float Vec2::getAngle() const
 {
-    float teta = atan(abs(x) / abs(y)) * 180 / M_PI;
+    float teta = abs(atan(abs(x / y))) * 180 / M_PI;
     if (x >= 0 && y >= 0)
     {
         return teta;
     }
     else if (x < 0 && y >= 0)
     {
-        return 180 - teta;
+        return 360 - teta;
     }
     else if (x < 0 && y < 0)
     {
         return 180 + teta;
     }
-    return 360 - teta;
+    return 180 - teta;
 }
 
 

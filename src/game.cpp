@@ -105,40 +105,84 @@ void Game::sRender()
 void Game::sMovement()
 {
     for (auto e : entities.getEntities()) {
-        if (e->tag() != "big-enemy"
-            && e->cShape != nullptr
-            && e->cTransform != nullptr
-            && e->cCollision != nullptr
-        )
+        if (e->cShape == nullptr
+            && e->cTransform == nullptr
+            && e->cCollision == nullptr) {
+            continue;
+        }
+
+        // player movement
+        if (e->cInput != nullptr && !(
+            e->cInput->up || e->cInput->down
+            || e->cInput->left || e->cInput->right
+        ))
         {
             continue;
         }
 
-        // check bounce x axis
-        if (window.overflowX(*e) || window.underflowX(*e))
+        if (e->tag() == "big-enemy")
         {
-            e->cTransform->velocity = Vec2(
-                -(e->cTransform->velocity.x),
-                e->cTransform->velocity.y);
-        }
+            // check bounce x axis
+            if (window.overflowX(*e) || window.underflowX(*e)) {
+                e->cTransform->velocity = Vec2(
+                    -(e->cTransform->velocity.x),
+                    e->cTransform->velocity.y);
+            }
 
-        // check bounce y axis
-        if (window.overflowY(*e) || window.underflowY(*e))
-        {
-            e->cTransform->velocity = Vec2(
-                e->cTransform->velocity.x,
-                -(e->cTransform->velocity.y));
+            // check bounce y axis
+            if (window.overflowY(*e) || window.underflowY(*e)) {
+                e->cTransform->velocity = Vec2(
+                    e->cTransform->velocity.x,
+                    -(e->cTransform->velocity.y));
+            }
         }
 
         // actual movement
-        e->cShape->circle.setPosition(e->cTransform->pos.x, e->cTransform->pos.y);
-        e->cTransform->pos += e->cTransform->velocity;
+        e->cShape->circle.setPosition(e->cTransform->position.x, e->cTransform->position.y);
+        e->cTransform->position += e->cTransform->velocity;
     }
 }
 
 void Game::setPaused(bool paused)
 {
     this->paused = paused;
+}
+
+void Game::spawnBullet(std::shared_ptr<Entity> entity, const Vec2& pos)
+{
+    if (paused) {
+        return;
+    }
+    // prepare velocity and bullet position
+    Vec2 entityOrigin = entity->cTransform != nullptr
+        ? entity->cTransform->position
+        : Vec2(0, 0);
+    float dist = entityOrigin.dist(pos);
+    float teta = (pos - entityOrigin).getAngle();
+    Vec2 bulletVelocity = Vec2::FromSpeedAndAngle(dist, teta).normalized() * bulletConfig.Speed;
+
+    Vec2 bulletCenter = (bulletVelocity.normalized() * playerConfig.ShapeRadius) + entityOrigin;
+
+    // set up bullet entity
+    auto bullet = entities.addEntity("bullet");
+    bullet->cTransform = std::make_shared<CTransform>(
+        bulletCenter,
+        bulletVelocity,
+        teta);
+    bullet->cShape = std::make_shared<CShape>(
+        bulletConfig.ShapeRadius,
+        30,
+        sf::Color(
+            bulletConfig.FillColor.R,
+            bulletConfig.FillColor.G,
+            bulletConfig.FillColor.B),
+        sf::Color(
+            bulletConfig.OutlineColor.R,
+            bulletConfig.OutlineColor.G,
+            bulletConfig.OutlineColor.B),
+        bulletConfig.OutlineThickness);
+    bullet->cLifespan = std::make_shared<CLifespan>(bulletConfig.Lifespan);
+    bullet->cCollision = std::make_shared<CCollision>(bulletConfig.CollisionRadius);
 }
 
 void Game::sUserInput()
@@ -161,6 +205,16 @@ void Game::sUserInput()
             default:
                 break;
             }
+        } else if (event.type == sf::Event::MouseButtonPressed) {
+            // spawn bullet
+            if (event.mouseButton.button == sf::Mouse::Left) {
+                Vec2 pos = Vec2(
+                    event.mouseButton.x,
+                    event.mouseButton.y);
+                spawnBullet(player, pos);
+            }
+            // spawn special wepon
+            if (event.mouseButton.button == sf::Mouse::Right) { }
         }
     }
 }
@@ -170,6 +224,10 @@ void Game::sLifespan()
     for (auto e : entities.getEntities()) {
         if (e->cLifespan != nullptr) {
             e->cLifespan->remaning -= 1;
+
+            if (e->cLifespan->remaning == 0) {
+                e->destroy();
+            }
         }
     }
 }
@@ -239,10 +297,8 @@ void Game::sEnemySpawner()
         sf::Color(
             enemyConfing.OutlineColor.R,
             enemyConfing.OutlineColor.G,
-            enemyConfing.OutlineColor.B
-        ),
-        enemyConfing.OutlineThickness
-    );
+            enemyConfing.OutlineColor.B),
+        enemyConfing.OutlineThickness);
 
     enemy->cScore = std::make_shared<CScore>(vertices * 100);
     enemy->cCollision = std::make_shared<CCollision>(enemyConfing.CollisionRadius);
