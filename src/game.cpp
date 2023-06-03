@@ -111,15 +111,7 @@ void Game::sMovement()
             continue;
         }
 
-        // player movement
-        if (e->cInput != nullptr && !(
-            e->cInput->up || e->cInput->down
-            || e->cInput->left || e->cInput->right
-        ))
-        {
-            continue;
-        }
-
+        // bounce big-enemy
         if (e->tag() == "big-enemy")
         {
             // check bounce x axis
@@ -137,9 +129,75 @@ void Game::sMovement()
             }
         }
 
-        // actual movement
-        e->cShape->circle.setPosition(e->cTransform->position.x, e->cTransform->position.y);
-        e->cTransform->position += e->cTransform->velocity;
+        // userinput movement movement
+        if (e->cInput != nullptr)
+        {
+            // no user input given
+            if(! (e->cInput->up
+                || e->cInput->down
+                || e->cInput->left
+                || e->cInput->right)
+            )
+            {
+                continue;
+            }
+            
+            if (e->cInput->up)
+            {
+                e->cTransform->position += Vec2(0, -e->cTransform->velocity.y);
+            }
+            if (window.underflowY(*e))
+            {
+                e->cTransform->position = Vec2(
+                    e->cTransform->position.x,
+                    e->cShape->circle.getRadius()
+                );
+            }
+            
+            if (e->cInput->down)
+            {
+                e->cTransform->position += Vec2(0, e->cTransform->velocity.y);
+            }
+            if (window.overflowY(*e))
+            {
+                e->cTransform->position = Vec2(
+                    e->cTransform->position.x,
+                    window.getSize().y - e->cShape->circle.getRadius()
+                );
+            }
+
+            if (e->cInput->left)
+            {
+                e->cTransform->position += Vec2(-e->cTransform->velocity.x, 0);
+            }
+            if (window.underflowX(*e))
+            {
+                e->cTransform->position = Vec2(
+                    e->cShape->circle.getRadius(),
+                    e->cTransform->position.y
+                );
+            }
+
+            if (e->cInput->right)
+            {
+                e->cTransform->position += Vec2(e->cTransform->velocity.x, 0);
+            }
+            if (window.overflowX(*e))
+            {
+                e->cTransform->position = Vec2(
+                    window.getSize().x - e->cShape->circle.getRadius(),
+                    e->cTransform->position.y
+                );
+            }
+
+            e->cShape->circle.setPosition(e->cTransform->position.x, e->cTransform->position.y);
+        }
+        // auto movement
+        else 
+        {
+            e->cShape->circle.setPosition(e->cTransform->position.x, e->cTransform->position.y);
+            e->cTransform->position += e->cTransform->velocity;
+        }
     }
 }
 
@@ -202,10 +260,40 @@ void Game::sUserInput()
             case sf::Keyboard::P:
                 setPaused(!paused);
                 break;
+            case sf::Keyboard::W:
+                player->cInput->up = true;
+                break;
+            case sf::Keyboard::A:
+                player->cInput->left = true;
+                break;
+            case sf::Keyboard::S:
+                player->cInput->down = true;
+                break;
+            case sf::Keyboard::D:
+                player->cInput->right = true;
+                break;
             default:
                 break;
             }
-        } else if (event.type == sf::Event::MouseButtonPressed) {
+        } else if (event.type == sf::Event::KeyReleased) {
+            switch (event.key.code) {
+            case sf::Keyboard::W:
+                player->cInput->up = false;
+                break;
+            case sf::Keyboard::A:
+                player->cInput->left = false;
+                break;
+            case sf::Keyboard::S:
+                player->cInput->down = false;
+                break;
+            case sf::Keyboard::D:
+                player->cInput->right = false;
+                break;
+            default:
+                break;
+            }
+        }
+        else if (event.type == sf::Event::MouseButtonPressed) {
             // spawn bullet
             if (event.mouseButton.button == sf::Mouse::Left) {
                 Vec2 pos = Vec2(
