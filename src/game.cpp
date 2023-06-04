@@ -98,6 +98,8 @@ void Game::sRender()
         }
     }
 
+    score.updateText();
+
     window.draw(score.Text);
     window.display();
 }
@@ -112,8 +114,7 @@ void Game::sMovement()
         }
 
         // bounce big-enemy
-        if (e->tag() == "big-enemy")
-        {
+        if (e->tag() == "big-enemy") {
             // check bounce x axis
             if (window.overflowX(*e) || window.underflowX(*e)) {
                 e->cTransform->velocity = Vec2(
@@ -130,71 +131,55 @@ void Game::sMovement()
         }
 
         // userinput movement movement
-        if (e->cInput != nullptr)
-        {
+        if (e->cInput != nullptr) {
             // no user input given
-            if(! (e->cInput->up
-                || e->cInput->down
-                || e->cInput->left
-                || e->cInput->right)
-            )
-            {
+            if (!(e->cInput->up
+                    || e->cInput->down
+                    || e->cInput->left
+                    || e->cInput->right)) {
                 continue;
             }
-            
-            if (e->cInput->up)
-            {
+
+            if (e->cInput->up) {
                 e->cTransform->position += Vec2(0, -e->cTransform->velocity.y);
             }
-            if (window.underflowY(*e))
-            {
+            if (window.underflowY(*e)) {
                 e->cTransform->position = Vec2(
                     e->cTransform->position.x,
-                    e->cShape->circle.getRadius()
-                );
+                    e->cShape->circle.getRadius());
             }
-            
-            if (e->cInput->down)
-            {
+
+            if (e->cInput->down) {
                 e->cTransform->position += Vec2(0, e->cTransform->velocity.y);
             }
-            if (window.overflowY(*e))
-            {
+            if (window.overflowY(*e)) {
                 e->cTransform->position = Vec2(
                     e->cTransform->position.x,
-                    window.getSize().y - e->cShape->circle.getRadius()
-                );
+                    window.getSize().y - e->cShape->circle.getRadius());
             }
 
-            if (e->cInput->left)
-            {
+            if (e->cInput->left) {
                 e->cTransform->position += Vec2(-e->cTransform->velocity.x, 0);
             }
-            if (window.underflowX(*e))
-            {
+            if (window.underflowX(*e)) {
                 e->cTransform->position = Vec2(
                     e->cShape->circle.getRadius(),
-                    e->cTransform->position.y
-                );
+                    e->cTransform->position.y);
             }
 
-            if (e->cInput->right)
-            {
+            if (e->cInput->right) {
                 e->cTransform->position += Vec2(e->cTransform->velocity.x, 0);
             }
-            if (window.overflowX(*e))
-            {
+            if (window.overflowX(*e)) {
                 e->cTransform->position = Vec2(
                     window.getSize().x - e->cShape->circle.getRadius(),
-                    e->cTransform->position.y
-                );
+                    e->cTransform->position.y);
             }
 
             e->cShape->circle.setPosition(e->cTransform->position.x, e->cTransform->position.y);
         }
         // auto movement
-        else 
-        {
+        else {
             e->cShape->circle.setPosition(e->cTransform->position.x, e->cTransform->position.y);
             e->cTransform->position += e->cTransform->velocity;
         }
@@ -292,8 +277,7 @@ void Game::sUserInput()
             default:
                 break;
             }
-        }
-        else if (event.type == sf::Event::MouseButtonPressed) {
+        } else if (event.type == sf::Event::MouseButtonPressed) {
             // spawn bullet
             if (event.mouseButton.button == sf::Mouse::Left) {
                 Vec2 pos = Vec2(
@@ -392,6 +376,66 @@ void Game::sEnemySpawner()
     enemy->cCollision = std::make_shared<CCollision>(enemyConfing.CollisionRadius);
 }
 
+void Game::spawnSmallEnemies(std::shared_ptr<Entity> entity)
+{
+}
+
+void Game::sCollision()
+{
+    auto bullets = entities.getEntities("bullet");
+    // check big-enemy collision (player/bullet)
+    for (auto bigEnemy : entities.getEntities("big-enemy")) {
+        if (std::any_of(bullets.begin(), bullets.end(), [&bigEnemy](auto bullet) {
+                bool colliding = bigEnemy->colliding(*bullet);
+                if (colliding)
+                {
+                    bullet->destroy();
+                }
+                return colliding;
+            })) {
+            // update score
+            if (bigEnemy->cScore != nullptr)
+            {
+                score.Value += bigEnemy->cScore->score;
+            }
+            // destroy bigEnemy and sapwn little enemies
+            bigEnemy->destroy();
+            spawnSmallEnemies(bigEnemy);
+        }
+
+        // destroy player and respawn in the middle
+        if (bigEnemy->colliding(*player)) {
+            player->destroy();
+            spawnPlayer();
+        }
+    }
+    // check small-enemy collision (player/bullet)
+    for (auto smallEnemy : entities.getEntities("small-enemy")) {
+        if (std::any_of(bullets.begin(), bullets.end(), [&smallEnemy](auto bullet) {
+                bool colliding = smallEnemy->colliding(*bullet);
+                if (colliding)
+                {
+                    bullet->destroy();
+                }
+                return colliding;
+            })) {
+            // update score
+            if (smallEnemy->cScore != nullptr)
+            {
+                score.Value += smallEnemy->cScore->score;
+            }
+            // destroy bigEnemy and sapwn little enemies
+            smallEnemy->destroy();
+        }
+
+        // destroy player and respawn in the middle
+        if (smallEnemy->colliding(*player)) {
+            player->destroy();
+            spawnPlayer();
+        }
+    }
+}
+
 int Game::run()
 {
     spawnPlayer();
@@ -401,6 +445,7 @@ int Game::run()
         sUserInput();
 
         if (!paused) {
+            sCollision();
             sMovement();
             sLifespan();
             sEnemySpawner();

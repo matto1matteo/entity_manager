@@ -1,6 +1,9 @@
 #include <algorithm>
 #include <entity/entity_manager.h>
 
+namespace mtt
+{
+    
 EntityManager::EntityManager()
 {
     init();
@@ -75,5 +78,12 @@ EntityVec & EntityManager::getEntities()
 
 EntityVec & EntityManager::getEntities(const std::string & tag)
 {
-    return m_entitiesMap.at(tag);
+    try {
+        return m_entitiesMap.at(tag);
+    }
+    catch (const std::out_of_range&) {
+        m_entitiesMap.insert({tag, EntityVec()});
+        return m_entitiesMap.at(tag);
+    }
+}
 }

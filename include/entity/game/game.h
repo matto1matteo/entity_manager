@@ -79,6 +79,7 @@ private:
     /// @param  `entity` bullet entity
     /// @param  `pos` vector that indicate the trajectory
     void spawnBullet(std::shared_ptr<Entity> entity, const Vec2& pos);
+
     void spawnSpecialWeapon(std::shared_ptr<Entity> entity);
 
 public:

@@ -11,6 +11,8 @@
 #include <components/shape.h>
 #include <components/transform.h>
 
+namespace mtt
+{
 class Entity {
     friend class EntityManager;
 
@@ -36,4 +38,14 @@ public:
     const std::string & tag() const { return m_tag; }
     const size_t id() const { return m_id; }
     void destroy() { m_active = false; }
+
+    /// @brief  will return true if both entities are capable of colliding,
+    ///         that is both have a CCollision component and the distance
+    ///         between their center is less then the sum of their
+    ///         respective radiuses
+    /// @param  `entity`    the entity to check against for collision
+    /// @return bool
+    bool colliding(const Entity & entity) const;
 };
+    
+}

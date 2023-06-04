@@ -5,6 +5,8 @@
 #include <map>
 #include <entity/entity.h>
 
+namespace mtt
+{
 typedef std::vector<std::shared_ptr<Entity>> EntityVec;
 typedef std::map<std::string, EntityVec> EntityMap;
 
@@ -49,3 +51,5 @@ public:
     EntityVec & getEntities(const std::string & entityTag);
     
 };
+    
+}

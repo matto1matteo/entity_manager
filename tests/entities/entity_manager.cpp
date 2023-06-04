@@ -2,6 +2,7 @@
 #include <entity/entity_manager.h>
 #include <iostream>
 
+using namespace mtt;
 class TestEntityManager
 {
 public:
