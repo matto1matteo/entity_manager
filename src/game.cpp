@@ -94,13 +94,24 @@ void Game::sRender()
 
     for (auto e : entities.getEntities()) {
         if (e->cShape != nullptr && e->cTransform != nullptr) {
+            if (e->cLifespan != nullptr)
+            {
+                sf::Color fillColor = e->cShape->circle.getFillColor();
+                
+                fillColor.a = (((float)e->cLifespan->remaning / (float)e->cLifespan->total) * 255);
+                e->cShape->circle.setFillColor(fillColor);
+
+                sf::Color outlineColor = e->cShape->circle.getOutlineColor();
+                outlineColor.a = (((float)e->cLifespan->remaning / (float)e->cLifespan->total) * 255);
+                e->cShape->circle.setOutlineColor(outlineColor);
+            }
             window.draw(e->cShape->circle);
         }
     }
 
     score.updateText();
-
     window.draw(score.Text);
+
     window.display();
 }
 
@@ -294,12 +305,14 @@ void Game::sUserInput()
 void Game::sLifespan()
 {
     for (auto e : entities.getEntities()) {
-        if (e->cLifespan != nullptr) {
-            e->cLifespan->remaning -= 1;
+        if (e->cLifespan == nullptr) {
+            continue;
+        }
 
-            if (e->cLifespan->remaning == 0) {
-                e->destroy();
-            }
+        e->cLifespan->remaning -= 1;
+
+        if (e->cLifespan->remaning == 0) {
+            e->destroy();
         }
     }
 }
