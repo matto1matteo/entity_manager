@@ -391,6 +391,41 @@ void Game::sEnemySpawner()
 
 void Game::spawnSmallEnemies(std::shared_ptr<Entity> entity)
 {
+    if (entity->cShape == nullptr || entity->cTransform == nullptr)
+    {
+        return;
+    }
+
+    size_t vertices = entity->cShape->circle.getPointCount();
+    Vec2 origin = entity->cTransform->position;
+    float speedLen = entity->cTransform->velocity.length();
+    sf::Color fillColor = entity->cShape->circle.getFillColor();
+    float teta = (float)(360 / vertices);
+    for (size_t i = 0; i < vertices; i++) {
+        Vec2 velocity = Vec2::FromSpeedAndAngle(speedLen, teta * i);
+        auto small = entities.addEntity("small-entity");
+        small->cShape = std::make_shared<CShape>(
+            enemyConfing.ShapeRadius / 3,
+            vertices,
+            fillColor,
+            sf::Color(
+                enemyConfing.OutlineColor.R,
+                enemyConfing.OutlineColor.R,
+                enemyConfing.OutlineColor.B
+            ),
+            enemyConfing.OutlineThickness
+        );
+        small->cLifespan = std::make_shared<CLifespan>(enemyConfing.SmallLifespan);
+        small->cTransform = std::make_shared<CTransform>(
+            origin,
+            velocity,
+            teta
+        );
+        small->cCollision = std::make_shared<CCollision>(
+            enemyConfing.CollisionRadius / 3
+        );
+        small->cScore = std::make_shared<CScore>(vertices * 200);
+    }
 }
 
 void Game::sCollision()

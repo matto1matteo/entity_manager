@@ -72,6 +72,8 @@ private:
     /// to the center of the CircleShape
     void spawnEnemy();
 
+    /// @brief  This method is used to spwan little enemies out of a bigg one
+    /// @param  entity  The enemy that the samll ones originated from
     void spawnSmallEnemies(std::shared_ptr<Entity> entity);
 
     /// @brief  `spanwBullet` will take player `entity` pointer and will spawn
